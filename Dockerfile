@@ -7,4 +7,4 @@ RUN apt-get update -yqq && \
     docker-php-ext-enable xdebug
 
 FROM base as prod
-COPY app/Factories/RouteFactory.php /var/www/webtrees/Factories/RouteFactory.php
+COPY app/Factories/RouteFactory.php /var/www/webtrees/app/Factories/RouteFactory.php
