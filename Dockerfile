@@ -6,5 +6,11 @@ RUN apt-get update -yqq && \
     pecl install xdebug && \
     docker-php-ext-enable xdebug
 
-FROM base as prod
-COPY app/Factories/RouteFactory.php /var/www/webtrees/app/Factories/RouteFactory.php
+FROM base AS prod
+COPY app/Factories/RouteFactory.php ./app/Factories/RouteFactory.php
+COPY app/Gedcom.php ./app/Gedcom.php
+COPY app/Http/RequestHandlers/EditMediaFileAction.php ./app/Http/RequestHandlers/EditMediaFileAction.php
+COPY app/Services/MediaFileService.php ./app/Services/MediaFileService.php
+COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
+COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml
+

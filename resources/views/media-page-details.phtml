@@ -18,6 +18,7 @@ use Illuminate\Support\Collection;
  * @var Tree                 $tree
  */
 
+$firstFile = $record->facts(['FILE'])->first();
 ?>
 
 <table class="table wt-facts-table">
@@ -62,6 +63,8 @@ use Illuminate\Support\Collection;
                     <?= Registry::elementFactory()->make('OBJE:FILE:TITL')->labelValue($media_file->title(), $record->tree()) ?>
                     <?= Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->labelValue($media_file->type(), $record->tree()) ?>
                     <?= Registry::elementFactory()->make('OBJE:FILE:FORM')->labelValue($media_file->format(), $record->tree()) ?>
+                    <?= Registry::elementFactory()->make('OBJE:FILE:DATE')->labelValue(strip_tags($firstFile->date()->display()), $record->tree()) ?>
+                    <?= Registry::elementFactory()->make('OBJE:FILE:PLAC')->labelValue(strip_tags($firstFile->place()->placeName()), $record->tree()) ?>
                 </div>
 
                 <div>
@@ -88,7 +91,6 @@ use Illuminate\Support\Collection;
             </td>
         </tr>
     <?php endforeach ?>
-
     <?php foreach ($record->facts()->filter(fn (Fact $fact): bool => $fact->tag() !== 'OBJE:FILE') as $fact) : ?>
         <?= view('fact', ['fact' => $fact, 'record' => $record]) ?>
     <?php endforeach ?>

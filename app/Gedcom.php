@@ -788,6 +788,8 @@ class Gedcom
             'OBJE:FILE:FORM'             => new MultimediaFormat(I18N::translate('Format')),
             'OBJE:FILE:FORM:TYPE'        => new SourceMediaType(I18N::translate('Media type')),
             'OBJE:FILE:TITL'             => new DescriptiveTitle(I18N::translate('Title')),
+            'OBJE:FILE:DATE'             => new DescriptiveTitle(I18N::translate('Date')),
+            'OBJE:FILE:PLAC'             => new DescriptiveTitle(I18N::translate('Place')),
             'OBJE:NOTE'                  => new NoteStructure(I18N::translate('Note')),
             'OBJE:REFN'                  => new UserReferenceNumber(I18N::translate('Reference number')),
             'OBJE:REFN:TYPE'             => new UserReferenceType(I18N::translate('Type of reference number')),

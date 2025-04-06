@@ -237,7 +237,7 @@ class MediaFileService
      *
      * @return string
      */
-    public function createMediaFileGedcom(string $file, string $type, string $title, string $note): string
+    public function createMediaFileGedcom(string $file, string $type, string $title, string $note, string $date = '', string $place = ''): string
     {
         $gedcom = '1 FILE ' . $file;
 
@@ -260,6 +260,14 @@ class MediaFileService
 
         if ($title !== '') {
             $gedcom .= "\n2 TITL " . strtr($title, ["\n" => "\n3 CONT "]);
+        }
+
+        if ($date !== '') {
+            $gedcom .= "\n2 DATE " . $date;
+        }
+
+        if ($place !== '') {
+            $gedcom .= "\n2 PLAC " . $place;
         }
 
         if ($note !== '') {

@@ -77,11 +77,15 @@ class EditMediaFileAction implements RequestHandlerInterface
         $remote   = Validator::parsedBody($request)->string('remote');
         $title    = Validator::parsedBody($request)->string('title');
         $type     = Validator::parsedBody($request)->string('type');
+        $date     = Validator::parsedBody($request)->string('date');
+        $place     = Validator::parsedBody($request)->string('place');
         $media    = Registry::mediaFactory()->make($xref, $tree);
         $media    = Auth::checkMediaAccess($media, true);
 
         $type  = Registry::elementFactory()->make('OBJE:FILE:FORM:TYPE')->canonical($type);
         $title = Registry::elementFactory()->make('OBJE:FILE:TITL')->canonical($title);
+        $date = Registry::elementFactory()->make('OBJE:FILE:DATE')->canonical($date);
+        $place = Registry::elementFactory()->make('OBJE:FILE:PLAC')->canonical($place);
 
         // Find the fact to edit
         $media_file = $media->mediaFiles()
@@ -136,7 +140,7 @@ class EditMediaFileAction implements RequestHandlerInterface
             }
         }
 
-        $gedcom = $this->media_file_service->createMediaFileGedcom($file, $type, $title, '');
+        $gedcom = $this->media_file_service->createMediaFileGedcom($file, $type, $title, '', $date, $place);
 
         $media->updateFact($fact_id, $gedcom, true);
 

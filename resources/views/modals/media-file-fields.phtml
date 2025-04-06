@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use Fisharebest\Webtrees\Elements\DateValue;
+use Fisharebest\Webtrees\Elements\PlaceName;
 use Fisharebest\Webtrees\Elements\SourceMediaType;
 use Fisharebest\Webtrees\Http\RequestHandlers\AutoCompleteFolder;
 use Fisharebest\Webtrees\I18N;
@@ -16,6 +18,7 @@ use Fisharebest\Webtrees\Tree;
  * @var array<string,string>     $unused_files
  */
 
+$fileFact = $media_file?->media()->facts(['FILE'])->first();
 ?>
 
 <div class="row mb-3 <?= $media_file instanceof MediaFile ? 'd-none' : '' ?>">
@@ -118,6 +121,24 @@ use Fisharebest\Webtrees\Tree;
     </label>
     <div class="col-sm-10">
         <?= (new SourceMediaType(''))->edit('type', 'type', $media_file ? $media_file->type() : '', $tree) ?>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label class="col-form-label col-sm-2" for="date">
+        <?= I18N::translate('Date') ?>
+    </label>
+    <div class="col-sm-10">
+        <?= (new DateValue(''))->edit('date', 'date', $fileFact?->attribute('DATE') ?? '', $tree) ?>
+    </div>
+</div>
+
+<div class="row mb-3">
+    <label class="col-form-label col-sm-2" for="place">
+        <?= I18N::translate('Place') ?>
+    </label>
+    <div class="col-sm-10">
+        <?= (new PlaceName(''))->edit('place', 'place', $fileFact?->place()->gedcomName() ?? '', $tree) ?>
     </div>
 </div>
 
