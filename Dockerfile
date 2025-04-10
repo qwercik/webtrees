@@ -14,4 +14,4 @@ COPY app/Services/MediaFileService.php ./app/Services/MediaFileService.php
 COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
 COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml
 COPY docker/webtrees/policy.xml /etc/ImageMagick-6/policy.xml
-
+COPY modules_v4/ ./modules_v4
