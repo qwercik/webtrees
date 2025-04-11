@@ -58,7 +58,8 @@ interface ImageFactoryInterface
         int $width,
         int $height,
         string $fit,
-        bool $add_watermark
+        bool $add_watermark,
+        string $display_params
     ): ResponseInterface;
 
     /**

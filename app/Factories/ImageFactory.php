@@ -172,7 +172,8 @@ class ImageFactory implements ImageFactoryInterface
         int $width,
         int $height,
         string $fit,
-        bool $add_watermark
+        bool $add_watermark,
+        string $display_params
     ): ResponseInterface {
         // Where are the images stored.
         $filesystem = $media_file->media()->tree()->mediaFilesystem();
@@ -191,10 +192,23 @@ class ImageFactory implements ImageFactoryInterface
                 (string) $height,
                 $fit,
                 (string) $add_watermark,
+                $display_params,
             ]);
 
-            $closure = function () use ($filesystem, $path, $width, $height, $fit, $add_watermark, $media_file): string {
+            $closure = function () use ($filesystem, $path, $width, $height, $fit, $add_watermark, $media_file, $display_params): string {
                 $image = $this->imageManager()->read(input: $filesystem->readStream($path));
+
+                $display_params = $this->parseDisplayParams($display_params);
+                if (isset($display_params['crop'])) {
+                    list($x1, $y1, $x2, $y2) = explode(',', $display_params['crop']);
+                    $image = $image->crop(
+                        (int)$x2 - (int)$x1,
+                        (int)$y2 - (int)$y1,
+                        (int)$x1,
+                        (int)$y1,
+                    );
+                }
+
                 $image = $this->resizeImage(image: $image, width: $width, height: $height, fit: $fit);
 
                 if ($add_watermark) {
@@ -340,5 +354,24 @@ class ImageFactory implements ImageFactoryInterface
         }
 
         return $default;
+    }
+
+    private function parseDisplayParams(string $display_params): array
+    {
+        if ($display_params === '') {
+            return [];
+        }
+
+        $data = base64_decode($display_params, true);
+        if ($data === false) {
+            return [];
+        }
+
+        $result = json_decode($data, true);
+        if ($result === false) {
+            return [];
+        }
+
+        return $result;
     }
 }

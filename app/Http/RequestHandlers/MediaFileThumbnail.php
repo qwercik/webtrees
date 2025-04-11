@@ -49,6 +49,7 @@ class MediaFileThumbnail implements RequestHandlerInterface
         $xref    = Validator::queryParams($request)->isXref()->string('xref');
         $fact_id = Validator::queryParams($request)->string('fact_id');
         $media   = Registry::mediaFactory()->make($xref, $tree);
+        $display_params = Validator::queryParams($request)->string('p', '');
 
         if ($media === null) {
             return Registry::imageFactory()->replacementImageResponse((string) StatusCodeInterface::STATUS_NOT_FOUND);
@@ -80,7 +81,8 @@ class MediaFileThumbnail implements RequestHandlerInterface
                     (int) $params['w'],
                     (int) $params['h'],
                     $params['fit'],
-                    $image_factory->fileNeedsWatermark($media_file, $user)
+                    $image_factory->fileNeedsWatermark($media_file, $user),
+                    $display_params,
                 );
 
                 return $response->withHeader('cache-control', 'public,max-age=31536000');

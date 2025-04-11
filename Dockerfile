@@ -20,6 +20,12 @@ COPY app/Factories/RouteFactory.php ./app/Factories/RouteFactory.php
 COPY app/Gedcom.php ./app/Gedcom.php
 COPY app/Http/RequestHandlers/EditMediaFileAction.php ./app/Http/RequestHandlers/EditMediaFileAction.php
 COPY app/Services/MediaFileService.php ./app/Services/MediaFileService.php
-COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
-COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml
+COPY app/Contracts/ImageFactoryInterface.php ./app/Contracts/ImageFactoryInterface.php
+COPY app/Factories/ImageFactory.php ./app/Factories/ImageFactory.php
+COPY app/Http/RequestHandlers/MediaFileThumbnail.php ./app/Http/RequestHandlers/MediaFileThumbnail.php
+COPY app/Individual.php ./app/Individual.php
+COPY app/MediaFile.php ./app/MediaFile.php
 COPY docker/webtrees/policy.xml /etc/ImageMagick-6/policy.xml
+COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
+COPY resources/views/individual-page-images.phtml ./resources/views/individual-page-images.phtml
+COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml

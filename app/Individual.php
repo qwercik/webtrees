@@ -25,6 +25,7 @@ use Fisharebest\Webtrees\Contracts\UserInterface;
 use Fisharebest\Webtrees\Elements\PedigreeLinkageType;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Illuminate\Support\Collection;
+use UksusoFF\WebtreesModules\Faces\Helpers\DatabaseHelper;
 
 use function array_key_exists;
 use function count;
@@ -342,9 +343,8 @@ class Individual extends GedcomRecord
     public function displayImage(int $width, int $height, string $fit, array $attributes): string
     {
         $media_file = $this->findHighlightedMediaFile();
-
         if ($media_file !== null) {
-            return $media_file->displayImage($width, $height, $fit, $attributes);
+            return $media_file->displayImage($width, $height, $fit, $attributes, $this->getThumbnailDisplayParams($media_file, 0));
         }
 
         if ($this->tree->getPreference('USE_SILHOUETTE') === '1') {
@@ -352,6 +352,32 @@ class Individual extends GedcomRecord
         }
 
         return '';
+    }
+
+    public function getThumbnailDisplayParams(MediaFile $media_file, int $order): array
+    {
+        $media_map = (new DatabaseHelper)->getMediaMap(
+            $this->tree->id(),
+            $media_file->media()->xref(),
+            $order,
+        );
+        if ($media_map === null) {
+            return [];
+        }
+
+        $media_map = json_decode($media_map, true);
+        if ($media_map === null) {
+            return [];
+        }
+
+        $person = array_values(array_filter($media_map, fn ($person) => $person['pid'] === $this->xref()))[0] ?? null;
+        if (empty($person)) {
+            return [];
+        }
+
+        return [
+            'crop' => implode(',', $person['coords']),
+        ];
     }
 
     /**

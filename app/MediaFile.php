@@ -173,17 +173,17 @@ class MediaFile
      *
      * @return string
      */
-    public function displayImage(int $width, int $height, string $fit, array $image_attributes = []): string
+    public function displayImage(int $width, int $height, string $fit, array $image_attributes = [], array $display_params = []): string
     {
         if ($this->isExternal()) {
             $src    = $this->multimedia_file_refn;
             $srcset = [];
         } else {
             // Generate multiple images for displays with higher pixel densities.
-            $src    = $this->imageUrl($width, $height, $fit);
+            $src    = $this->imageUrl($width, $height, $fit, $display_params);
             $srcset = [];
             foreach ([2, 3, 4] as $x) {
-                $srcset[] = $this->imageUrl($width * $x, $height * $x, $fit) . ' ' . $x . 'x';
+                $srcset[] = $this->imageUrl($width * $x, $height * $x, $fit, $display_params) . ' ' . $x . 'x';
             }
         }
 
@@ -230,7 +230,7 @@ class MediaFile
      *
      * @return string
      */
-    public function imageUrl(int $width, int $height, string $fit): string
+    public function imageUrl(int $width, int $height, string $fit, array $display_params = []): string
     {
         // Sign the URL, to protect against mass-resize attacks.
         $glide_key = Site::getPreference('glide-key');
@@ -250,6 +250,10 @@ class MediaFile
             'fit'       => $fit,
             'mark'      => Registry::imageFactory()->thumbnailNeedsWatermark($this, Auth::user())
         ];
+
+        if (!empty($display_params)) {
+            $params['p'] = rtrim(strtr(base64_encode(json_encode($display_params)), '+/', '-_'), '=');
+        }
 
         $params['s'] = $this->signature($params);
 
