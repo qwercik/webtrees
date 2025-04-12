@@ -29,3 +29,5 @@ COPY docker/webtrees/policy.xml /etc/ImageMagick-6/policy.xml
 COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
 COPY resources/views/individual-page-images.phtml ./resources/views/individual-page-images.phtml
 COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml
+COPY resources/views/selects/individual.phtml ./resources/views/selects/individual.phtml
+

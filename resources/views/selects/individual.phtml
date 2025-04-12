@@ -9,9 +9,10 @@ use Fisharebest\Webtrees\MediaFile;
  * @var Individual $individual
  */
 
+$media_file = $individual->findHighlightedMediaFile()
 ?>
 
-<?php if ($individual->findHighlightedMediaFile() instanceof MediaFile) : ?>
-    <?= $individual->findHighlightedMediaFile()->displayImage(30, 40, 'crop', []) ?>&nbsp;
+<?php if ($media_file instanceof MediaFile) : ?>
+    <?= $media_file->displayImage(30, 40, 'crop', [], $individual->getThumbnailDisplayParams($media_file, 0)) ?>&nbsp;
 <?php endif; ?>
 <?= $individual->fullName() ?>, <?= $individual->lifespan() ?>
