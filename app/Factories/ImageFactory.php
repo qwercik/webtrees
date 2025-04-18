@@ -356,7 +356,7 @@ class ImageFactory implements ImageFactoryInterface
         return $default;
     }
 
-    private function parseDisplayParams(string $display_params): array
+    protected function parseDisplayParams(string $display_params): array
     {
         if ($display_params === '') {
             return [];

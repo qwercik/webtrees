@@ -12,6 +12,7 @@ RUN apt-get update -yqq && \
 
 FROM buildable AS build-prod
 COPY modules_v4/ ./modules_v4
+RUN composer install -d ./modules_v4/job-queue
 RUN composer install -d ./modules_v4/albums-manager
 
 FROM base AS prod

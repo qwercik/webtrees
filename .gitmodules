@@ -4,3 +4,6 @@
 [submodule "modules_v4/faces"]
 	path = modules_v4/faces
 	url = git@github.com:qwercik/webtrees-faces.git
+[submodule "modules_v4/job-queue"]
+	path = modules_v4/job-queue
+	url = git@github.com:qwercik/webtrees-job-queue.git
