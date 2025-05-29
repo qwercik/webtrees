@@ -26,6 +26,7 @@ use Fisharebest\Webtrees\Elements\PedigreeLinkageType;
 use Fisharebest\Webtrees\Http\RequestHandlers\IndividualPage;
 use Illuminate\Support\Collection;
 use UksusoFF\WebtreesModules\Faces\Helpers\DatabaseHelper;
+use UksusoFF\WebtreesModules\Faces\Repository\MediaFileRepository;
 
 use function array_key_exists;
 use function count;
@@ -315,6 +316,17 @@ class Individual extends GedcomRecord
      */
     public function findHighlightedMediaFile(): MediaFile|null
     {
+        $fact = $this->findHighlightedMediaFileFact();
+        $target = $fact?->target();
+        if ($target instanceof Media) {
+            return $target->firstImageFile();
+        }
+
+        return null;
+    }
+
+    public function findHighlightedMediaFileFact(): ?Fact
+    {
         $fact = $this->facts(['OBJE'])
             ->first(static function (Fact $fact): bool {
                 $media = $fact->target();
@@ -322,8 +334,8 @@ class Individual extends GedcomRecord
                 return $media instanceof Media && $media->firstImageFile() instanceof MediaFile;
             });
 
-        if ($fact instanceof Fact && $fact->target() instanceof Media) {
-            return $fact->target()->firstImageFile();
+        if ($fact instanceof Fact) {
+            return $fact;
         }
 
         return null;
@@ -356,21 +368,16 @@ class Individual extends GedcomRecord
 
     public function getThumbnailDisplayParams(MediaFile $media_file, int $order): array
     {
-        $media_map = (new DatabaseHelper)->getMediaMap(
+        $data = (new MediaFileRepository)->getMediaFileData(
             $this->tree->id(),
             $media_file->media()->xref(),
-            $order,
+            order: $order,
         );
-        if ($media_map === null) {
+        if ($data === null) {
             return [];
         }
 
-        $media_map = json_decode($media_map, true);
-        if ($media_map === null) {
-            return [];
-        }
-
-        $person = array_values(array_filter($media_map, fn ($person) => $person['pid'] === $this->xref()))[0] ?? null;
+        $person = array_values(array_filter($data->coordinates, fn ($person) => $person['pid'] === $this->xref()))[0] ?? null;
         if (empty($person)) {
             return [];
         }
@@ -1119,3 +1126,4 @@ class Individual extends GedcomRecord
             ->get();
     }
 }
+
