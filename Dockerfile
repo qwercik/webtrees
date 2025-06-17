@@ -14,6 +14,7 @@ FROM buildable AS build-prod
 COPY modules_v4/ ./modules_v4
 RUN composer install -d ./modules_v4/job-queue
 RUN composer install -d ./modules_v4/albums-manager
+RUN composer install -d ./modules_v4/proxy-auth
 
 FROM base AS prod
 COPY --from=build-prod /var/www/webtrees/modules_v4/ ./modules_v4
