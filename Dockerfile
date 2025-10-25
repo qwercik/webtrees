@@ -1,35 +1,49 @@
-FROM nathanvaughn/webtrees:2.2.1 AS base
+FROM php:8.4-apache AS base
+RUN apt-get update -yqq && \
+    apt-get install -yqq --no-install-recommends curl libmagickwand-dev libzip-dev mariadb-client patch python3 unzip && \
+    pecl install imagick && \
+    docker-php-ext-enable imagick && \
+    docker-php-ext-configure gd --with-freetype --with-jpeg && \
+    docker-php-ext-install -j"$(nproc)" pdo pdo_mysql zip intl gd exif && \
+    apt-get autoremove -y && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/tmp/* /etc/apache2/sites-enabled/000-*.conf && \
+    a2enmod rewrite headers remoteip && \
+    usermod -u 1000 www-data && \
+    chown www-data:www-data /var/www/html
+
 
 FROM base AS buildable
 RUN curl -o /usr/local/bin/composer https://getcomposer.org/composer.phar && \
     chmod +x /usr/local/bin/composer
 
+
 FROM buildable AS dev
+ENV NVM_DIR /root/.nvm
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash \
+    && . $NVM_DIR/nvm.sh \
+    && nvm install 24.10.0
 RUN apt-get update -yqq && \
     apt-get install -yqq --no-install-recommends build-essential vim git && \
     pecl install xdebug && \
     docker-php-ext-enable xdebug
+COPY composer.json composer.lock package.json package-lock.json ./
 
 FROM buildable AS build-prod
-COPY modules_v4/ ./modules_v4
-RUN composer install -d ./modules_v4/job-queue
-RUN composer install -d ./modules_v4/albums-manager
-RUN composer install -d ./modules_v4/proxy-auth
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
+    docker-php-ext-install opcache
+USER www-data
+COPY . /var/www/html
+RUN find modules_v4/ -maxdepth 2 -name composer.json -execdir composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader \;
+
 
 FROM base AS prod
-COPY --from=build-prod /var/www/webtrees/modules_v4/ ./modules_v4
-COPY app/Factories/RouteFactory.php ./app/Factories/RouteFactory.php
-COPY app/Gedcom.php ./app/Gedcom.php
-COPY app/Http/RequestHandlers/EditMediaFileAction.php ./app/Http/RequestHandlers/EditMediaFileAction.php
-COPY app/Services/MediaFileService.php ./app/Services/MediaFileService.php
-COPY app/Contracts/ImageFactoryInterface.php ./app/Contracts/ImageFactoryInterface.php
-COPY app/Factories/ImageFactory.php ./app/Factories/ImageFactory.php
-COPY app/Http/RequestHandlers/MediaFileThumbnail.php ./app/Http/RequestHandlers/MediaFileThumbnail.php
-COPY app/Individual.php ./app/Individual.php
-COPY app/MediaFile.php ./app/MediaFile.php
-COPY docker/webtrees/policy.xml /etc/ImageMagick-6/policy.xml
-COPY resources/views/media-page-details.phtml ./resources/views/media-page-details.phtml
-COPY resources/views/individual-page-images.phtml ./resources/views/individual-page-images.phtml
-COPY resources/views/modals/media-file-fields.phtml ./resources/views/modals/media-file-fields.phtml
-COPY resources/views/selects/individual.phtml ./resources/views/selects/individual.phtml
-
+RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
+    docker-php-ext-install opcache
+RUN apt-get purge gcc g++ make -y
+COPY docker/www/policy.xml /etc/ImageMagick-6/policy.xml
+# COPY docker/www/vhost.conf /etc/apache2/sites-enabled/000-default.conf
+COPY docker/www/remoteip.conf /etc/apache2/conf-enabled/
+COPY docker/www/prod/security.conf /etc/apache2/conf-enabled/
+USER www-data
+COPY --from=build-prod . .

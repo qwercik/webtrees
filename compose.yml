@@ -1,0 +1,25 @@
+services:
+  www:
+    build:
+      context: .
+      target: dev
+    restart: unless-stopped
+    ports:
+      - 80:80
+    volumes:
+      - ".:/var/www/html:rw"
+      - "./docker/www/remoteip.conf:/etc/apache2/sites-enabled/remoteip.conf:ro"
+      - "./docker/www/dev/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini:ro"
+    depends_on:
+      - db
+    extra_hosts:
+      - host.docker.internal:host-gateway
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - 3306:3306
+
+volumes:
+  db:

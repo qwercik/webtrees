@@ -1,0 +1,13 @@
+.github
+tests/
+.coveralls.yml
+.dockerignore
+.gitignore
+.gitmodules
+apple-touch-icon.png
+CONTRIBUTING.md
+Dockerfile
+LICENSE.md
+phpstan-baseline.neon
+README.md
+SECURITY.md
