@@ -33,6 +33,7 @@ jobs:
           images: ghcr.io/${{ github.repository }}
           tags: |
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/master' }}
+            type=raw,value=latest-rc,enable=${{ github.ref == 'refs/heads/develop' }}
 
       - name: Build and push Docker image
         id: push

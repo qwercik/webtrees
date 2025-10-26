@@ -33,8 +33,14 @@ FROM buildable AS build-prod
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     docker-php-ext-install opcache
 USER www-data
-COPY . /var/www/html
-RUN find modules_v4/ -maxdepth 2 -name composer.json -execdir composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader \;
+
+COPY .htaccess composer.json composer.lock favicon.ico index.php package-lock.json package.json webpack.mix.js ./
+COPY app ./app
+COPY modules_v4 ./modules_v4
+COPY public ./public
+COPY resources ./resources
+COPY data/.htaccess data/index.php ./data/
+RUN find . -maxdepth 2 -name composer.json -execdir composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader \;
 
 
 FROM base AS prod
@@ -42,8 +48,8 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     docker-php-ext-install opcache
 RUN apt-get purge gcc g++ make -y
 COPY docker/www/policy.xml /etc/ImageMagick-6/policy.xml
-# COPY docker/www/vhost.conf /etc/apache2/sites-enabled/000-default.conf
 COPY docker/www/remoteip.conf /etc/apache2/conf-enabled/
 COPY docker/www/prod/security.conf /etc/apache2/conf-enabled/
+COPY --from=build-prod /var/www/html .
+RUN chown -R www-data:www-data .
 USER www-data
-COPY --from=build-prod . .
