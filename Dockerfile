@@ -29,18 +29,17 @@ RUN apt-get update -yqq && \
     docker-php-ext-enable xdebug
 COPY composer.json composer.lock package.json package-lock.json ./
 
+
 FROM buildable AS build-prod
 RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini" && \
     docker-php-ext-install opcache
-USER www-data
-
 COPY .htaccess composer.json composer.lock favicon.ico index.php package-lock.json package.json webpack.mix.js ./
 COPY app ./app
 COPY modules_v4 ./modules_v4
 COPY public ./public
 COPY resources ./resources
 COPY data/.htaccess data/index.php ./data/
-RUN find . -maxdepth 2 -name composer.json -execdir composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader \;
+RUN find . -maxdepth 3 -name composer.json -execdir composer install --prefer-dist --no-progress --no-dev --no-scripts --optimize-autoloader \;
 
 
 FROM base AS prod
