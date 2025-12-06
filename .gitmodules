@@ -11,5 +11,5 @@
 	path = modules_v4/job-queue
 	url = git@github.com:qwercik/webtrees-job-queue.git
 [submodule "modules_v4/proxy-auth"]
-	path = modules_v4/proxy-auth
+	path = modules_v4/000-proxy-auth
 	url = git@github.com:qwercik/webtrees-proxy-auth.git
