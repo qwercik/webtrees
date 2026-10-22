@@ -1,4 +1,4 @@
-FROM php:8.4-apache AS base
+FROM php:8.4.27-apache AS base
 RUN apt-get update -yqq && \
     apt-get install -yqq --no-install-recommends curl libmagickwand-dev libzip-dev mariadb-client patch python3 unzip && \
     pecl install imagick && \
