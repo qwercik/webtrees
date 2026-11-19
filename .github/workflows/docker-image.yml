@@ -1,5 +1,7 @@
 name: Build and push Docker image
 on:
+  schedule:
+    - cron: "0 3 * * *"
   push:
     branches: [ "master", "develop" ]
 jobs:
